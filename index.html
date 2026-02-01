@@ -1,0 +1,2669 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Contratações</title>
+<style>
+    /* ===== SISTEMA DE LOGIN DO SEGUNDO CÓDIGO ===== */
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        background: rgba(0,0,0,0.8);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10000;
+    }
+
+    .login-box {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .login-header h1 {
+        color: #1f2937;
+        margin-bottom: 10px;
+        font-size: 28px;
+    }
+
+    .login-header p {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .login-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .login-form label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 14px;
+    }
+
+    .login-form input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e1e5eb;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: white;
+        color: #333;
+    }
+
+    .login-form input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 14px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+    }
+
+    .btn-login:hover {
+        background: #0056b3;
+    }
+
+    .user-options {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        font-size: 13px;
+    }
+
+    .user-options a {
+        color: #007bff;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .user-options a:hover {
+        text-decoration: underline;
+    }
+
+    .login-footer {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #dee2e6;
+        color: #6c757d;
+        font-size: 12px;
+    }
+
+    /* ===== MODAL DE CADASTRO ===== */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    }
+
+    .modal-cadastro {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        color: #1f2937;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #6c757d;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #334155;
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e2e8f0;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: all 0.3s;
+        background: white;
+        color: #334155;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+    }
+
+    .modal-footer {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .modal-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .modal-btn.cancel {
+        background: #6c757d;
+        color: white;
+    }
+
+    .modal-btn.save {
+        background: #28a745;
+        color: white;
+    }
+
+    /* ===== HEADER DO USUÁRIO ===== */
+    .main-header {
+        background: white;
+        padding: 10px 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        display: none;
+    }
+
+    .logo {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1f2937;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 5px;
+        transition: background 0.3s;
+    }
+
+    .user-info:hover {
+        background: #f8f9fa;
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #007bff;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .user-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 14px;
+    }
+
+    .user-role {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    /* ===== ESTILOS DO PRIMEIRO CÓDIGO (BASE) ===== */
+    html, body {
+        height: 100%;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-image: url("fundo.jpeg");
+        background-size: 100% auto;
+        background-position: center top;    
+        background-repeat: no-repeat;
+        padding: 20px;
+        position: relative;
+    }
+
+    /* ÁREA DE ADMIN DE USUÁRIOS */
+    .admin-users-panel {
+        background: rgba(255,255,255,0.95);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        margin-bottom: 20px;
+        display: none;
+    }
+    
+    .user-list {
+        margin-top: 15px;
+    }
+    
+    .user-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .user-info {
+        flex: 1;
+    }
+    
+    .user-name {
+        font-weight: bold;
+        color: #1f2937;
+    }
+    
+    .user-email {
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+    .user-role-badge {
+        background: #17a2b8;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+        margin-left: 10px;
+    }
+    
+    .user-role-badge.admin {
+        background: #dc3545;
+    }
+    
+    .user-role-badge.editor {
+        background: #28a745;
+    }
+    
+    .user-role-badge.viewer {
+        background: #6c757d;
+    }
+    
+    .user-actions {
+        display: flex;
+        gap: 5px;
+    }
+    
+    .user-action-btn {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+    
+    .user-action-btn.edit {
+        background: #17a2b8;
+    }
+    
+    .user-action-btn.delete {
+        background: #dc3545;
+    }
+    
+    .user-action-btn.reset {
+        background: #ffc107;
+        color: #000;
+    }
+    
+    /* INFORMAÇÕES DO USUÁRIO LOGADO */
+    .user-info-bar {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255,255,255,0.9);
+        padding: 10px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        display: none;
+    }
+    
+    .current-user-name {
+        font-weight: bold;
+        color: #1f2937;
+    }
+    
+    .current-user-role {
+        background: #17a2b8;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: bold;
+    }
+    
+    .current-user-role.admin {
+        background: #dc3545;
+    }
+    
+    .current-user-role.editor {
+        background: #28a745;
+    }
+    
+    .current-user-role.viewer {
+        background: #6c757d;
+    }
+    
+    .logout-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+    
+    .logout-btn:hover {
+        background: #c82333;
+    }
+    
+    /* Controles baseados no nível de usuário */
+    .admin-only {
+        display: none;
+    }
+    
+    .editor-only {
+        display: none;
+    }
+
+    /* RESTO DO ESTILO DO PAINEL */
+    .titulo-container {
+        position: absolute;
+        top: 140px;
+        left: 205px;
+        cursor: move;
+        z-index: 10;
+        background: rgba(255,255,255,0.9);
+        padding: 10px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .titulo-container h1 {
+        color: #000000;
+        margin: 0;
+        font-size: 40px;
+    }
+
+    .painel {
+        background: rgba(255,255,255,0.95);
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        position: relative;
+        z-index: 1;
+        margin-top: 60px;
+    }
+
+    #painelVagas {
+        margin-top: 180px;
+    }
+
+    .controles-filtro {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    input[type="text"], select {
+        flex: 1;
+        min-width: 200px;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        color: #000;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        margin-top: 15px;
+    }
+
+    th, td {
+        padding: 10px 8px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        background: #1f2937;
+        color: #fff;
+        position: sticky;
+        top: 0;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .status-disponivel {
+        color: green;
+        font-weight: bold;
+    }
+
+    .status-analise {
+        color: orange;
+        font-weight: bold;
+    }
+    
+    .status-contratado {
+        color: blue;
+        font-weight: bold;
+    }
+
+    .btn-filtro {
+        padding: 8px 16px;
+        border: 1px solid #ccc;
+        background: #f8f9fa;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    
+    .btn-filtro:hover {
+        background: #e9ecef;
+    }
+    
+    .btn-filtro.ativo {
+        background: #1f2937;
+        color: white;
+        border-color: #1f2937;
+    }
+
+    .btn-atualizar {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .btn-atualizar:hover {
+        background: #45a049;
+    }
+
+    .compatibilidade-alta {
+        background-color: #d4edda;
+        color: #155724;
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    .compatibilidade-media {
+        background-color: #fff3cd;
+        color: #856404;
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    .compatibilidade-baixa {
+        background-color: #f8d7da;
+        color: #721c24;
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    .match-item {
+        margin: 2px 0;
+        padding: 3px 6px;
+        background: #e9ecef;
+        border-radius: 3px;
+        font-size: 12px;
+    }
+
+    .acao-btn {
+        padding: 5px 10px;
+        margin: 2px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .acao-editar {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .acao-excluir {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .nova-empresa-cell {
+        font-style: italic;
+        color: #666;
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .nova-empresa-cell:hover {
+        background-color: #f0f8ff;
+    }
+    
+    .edit-icon {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 10px;
+        color: #6c757d;
+        opacity: 0.5;
+    }
+    
+    .formulario-adicao {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 2px dashed #dee2e6;
+    }
+    
+    .formulario-adicao h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .linha-formulario {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .linha-formulario > div {
+        flex: 1;
+        min-width: 150px;
+    }
+    
+    .linha-formulario label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #495057;
+        font-size: 13px;
+    }
+    
+    .btn-adicionar {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 10px;
+        transition: background 0.3s;
+    }
+    
+    .btn-adicionar:hover {
+        background: #0056b3;
+    }
+    
+    .contador-registros {
+        background: #6c757d;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        margin-left: 10px;
+    }
+    
+    .btn-toggle-form {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        margin-left: 10px;
+    }
+    
+    .btn-toggle-form:hover {
+        background: #5a6268;
+    }
+    
+    .data-atualizacao {
+        font-size: 11px;
+        color: #6c757d;
+        font-style: italic;
+        white-space: nowrap;
+    }
+    
+    .data-atualizacao-cell {
+        min-width: 120px;
+    }
+    
+    .btn-atualizar-data {
+        background: #17a2b8;
+        color: white;
+        border: none;
+        padding: 3px 8px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 10px;
+        margin-top: 3px;
+        display: block;
+    }
+    
+    .btn-atualizar-data:hover {
+        background: #138496;
+    }
+    
+    .btn-excel {
+        background: #1d6f42;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: background 0.3s;
+    }
+    
+    .btn-excel:hover {
+        background: #155d32;
+    }
+    
+    .btn-limpar {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: background 0.3s;
+    }
+    
+    .btn-limpar:hover {
+        background: #c82333;
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding: 10px;
+            background-size: cover;
+        }
+        
+        .user-info-bar {
+            position: relative;
+            top: auto;
+            right: auto;
+            margin: 10px auto;
+            width: 90%;
+            justify-content: center;
+        }
+        
+        .titulo-container {
+            position: relative;
+            top: auto;
+            left: auto;
+            margin: 10px auto 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .titulo-container h1 {
+            font-size: 28px;
+        }
+        
+        #painelVagas {
+            margin-top: 20px;
+        }
+        
+        .controles-filtro {
+            flex-direction: column;
+        }
+        
+        .controles-filtro input[type="text"],
+        .controles-filtro select {
+            min-width: 100%;
+        }
+        
+        table {
+            font-size: 12px;
+            min-width: 800px;
+        }
+        
+        .login-box {
+            width: 90%;
+            padding: 20px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<!-- ===== TELA DE LOGIN DO SEGUNDO CÓDIGO ===== -->
+<div id="loginScreen" class="login-container">
+    <div class="login-box">
+        <div class="login-header">
+            <h1>Painel de Contratações</h1>
+            <p>Faça login com email ou usuário (nome.sobrenome)</p>
+        </div>
+        
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="username">Email ou Usuário</label>
+                <input type="text" id="username" placeholder="email@exemplo.com ou nome.sobrenome" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" placeholder="Digite sua senha" required>
+            </div>
+            
+            <button type="submit" class="btn-login">Entrar no Sistema</button>
+            
+            <div class="user-options">
+                <a onclick="mostrarCadastro()">Criar nova conta</a>
+                <a onclick="mostrarCredenciaisPadrao()">Usuários padrão</a>
+            </div>
+        </form>
+        
+        <div class="login-footer">
+            <p>Sistema de Gestão v2.0</p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL DE CADASTRO ===== -->
+<div id="cadastroModal" class="modal-overlay">
+    <div class="modal-cadastro">
+        <div class="modal-header">
+            <h2>Criar Nova Conta</h2>
+            <button class="close-modal" onclick="fecharCadastro()">×</button>
+        </div>
+        
+        <form id="cadastroForm">
+            <div class="form-group">
+                <label for="novoNome">Nome *</label>
+                <input type="text" id="novoNome" placeholder="Ex: João" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="novoSobrenome">Sobrenome *</label>
+                <input type="text" id="novoSobrenome" placeholder="Ex: Silva" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="novoEmail">Email *</label>
+                <input type="email" id="novoEmail" placeholder="email@exemplo.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="novaSenha">Senha *</label>
+                <input type="password" id="novaSenha" placeholder="Mínimo 6 caracteres" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmarSenha">Confirmar Senha *</label>
+                <input type="password" id="confirmarSenha" placeholder="Repita a senha" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="novoTipo">Tipo de Conta *</label>
+                <select id="novoTipo" required>
+                    <option value="">Selecione o tipo de conta</option>
+                    <option value="viewer">Visualizador (Apenas leitura)</option>
+                    <option value="editor">Editor (Adicionar/Editar)</option>
+                    <option value="admin">Administrador (Acesso total)</option>
+                </select>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="modal-btn cancel" onclick="fecharCadastro()">
+                    Cancelar
+                </button>
+                <button type="submit" class="modal-btn save" id="btnCriarConta">
+                    Criar Conta
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- BARRA DO USUÁRIO LOGADO (DO PRIMEIRO CÓDIGO) -->
+<div class="user-info-bar" id="userInfoBar">
+    <div class="current-user-name" id="currentUserName">Usuário</div>
+    <span class="current-user-role" id="currentUserRole">Nível</span>
+    <button class="logout-btn" onclick="fazerLogout()">Sair</button>
+</div>
+
+<!-- TÍTULO DO SISTEMA -->
+<div class="titulo-container" id="titulo">
+    <h1>Painel de Contratações</h1>
+</div>
+
+<!-- PAINEL PRINCIPAL -->
+<div id="conteudoPrincipal" style="display: none;">
+
+<!-- ADMINISTRAÇÃO DE USUÁRIOS (SÓ PARA ADMINS) -->
+<div class="admin-users-panel" id="adminUsersPanel">
+    <h2>👥 Administração de Usuários
+        <button class="btn-toggle-form" onclick="toggleFormulario('formNovoUsuario')">
+            ➕ Novo Usuário
+        </button>
+    </h2>
+    
+    <div class="formulario-adicao" id="formNovoUsuario" style="display: none;">
+        <h3>➕ Novo Usuário</h3>
+        <div class="linha-formulario">
+            <div>
+                <label>Nome:</label>
+                <input type="text" id="novoUsuarioNome" placeholder="Nome">
+            </div>
+            <div>
+                <label>Sobrenome:</label>
+                <input type="text" id="novoUsuarioSobrenome" placeholder="Sobrenome">
+            </div>
+            <div>
+                <label>Email:</label>
+                <input type="email" id="novoUsuarioEmail" placeholder="email@exemplo.com">
+            </div>
+            <div>
+                <label>Nível:</label>
+                <select id="novoUsuarioNivel">
+                    <option value="viewer">Visualizador</option>
+                    <option value="editor">Editor</option>
+                    <option value="admin">Administrador</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-adicionar" onclick="criarNovoUsuario()">
+            💾 Criar Usuário
+        </button>
+    </div>
+    
+    <div class="user-list" id="listaUsuarios">
+        <!-- Lista de usuários será carregada aqui -->
+    </div>
+</div>
+
+<!-- PROFISSIONAIS -->
+<div class="painel" id="painelVagas">
+    <h2>Profissionais 
+        <button class="btn-toggle-form editor-only" onclick="toggleFormulario('formProfissionais')">
+            📝 Adicionar Profissional
+        </button>
+        <span class="contador-registros" id="contadorProfissionais">4</span>
+    </h2>
+    
+    <div class="controles-filtro">
+        <button class="btn-excel" onclick="exportarParaExcel('profissionais')">
+            📊 Exportar para Excel
+        </button>
+        <button class="btn-limpar admin-only" onclick="limparTodosDados()">
+            🗑️ Limpar Todos os Dados
+        </button>
+    </div>
+    
+    <div class="formulario-adicao editor-only" id="formProfissionais" style="display: none;">
+        <h3>➕ Novo Profissional</h3>
+        <div id="linhasFormProfissionais"></div>
+        <button class="btn-adicionar" onclick="adicionarProfissionalForm()">
+            💾 Salvar e Adicionar Novo
+        </button>
+        <button class="btn-adicionar" onclick="adicionarLinhaFormulario('profissionais')" style="background: #6c757d;">
+            ➕ Nova Linha em Branco
+        </button>
+    </div>
+    
+    <div class="controles-filtro">
+        <input type="text" id="filtroVagas" placeholder="Filtrar por nome ou cargo..." 
+               onkeyup="filtrarTabela('filtroVagas', 'tabelaVagas')">
+        
+        <div>
+            <button class="btn-filtro ativo" onclick="filtrarPorStatus('todos', 'profissionais')">Todos</button>
+            <button class="btn-filtro" onclick="filtrarPorStatus('disponivel', 'profissionais')">Disponíveis</button>
+            <button class="btn-filtro" onclick="filtrarPorStatus('contratado', 'profissionais')">Contratados</button>
+        </div>
+        
+        <button class="btn-atualizar" onclick="atualizarCompatibilidade()">
+            🔄 Atualizar Compatibilidade
+        </button>
+    </div>
+    
+    <table id="tabelaVagas">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Cargo</th>
+                <th>Empresa Anterior</th>
+                <th>Disponibilidade</th>
+                <th>Nova Empresa</th>
+                <th>Compatibilidade</th>
+                <th>Última Atualização</th>
+                <th class="editor-only">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="corpoTabelaVagas">
+        </tbody>
+    </table>
+</div>
+
+<!-- VAGAS -->
+<div class="painel">
+    <h2>Vagas Disponíveis
+        <button class="btn-toggle-form editor-only" onclick="toggleFormulario('formVagas')">
+            📝 Adicionar Vaga
+        </button>
+        <span class="contador-registros" id="contadorVagas">4</span>
+    </h2>
+    
+    <div class="controles-filtro">
+        <button class="btn-excel" onclick="exportarParaExcel('vagas')">
+            📊 Exportar para Excel
+        </button>
+        <button class="btn-excel" onclick="exportarParaExcel('matching')" style="background: #6c757d;">
+            🔗 Exportar Matching
+        </button>
+    </div>
+    
+    <div class="formulario-adicao editor-only" id="formVagas" style="display: none;">
+        <h3>➕ Nova Vaga</h3>
+        <div id="linhasFormVagas"></div>
+        <button class="btn-adicionar" onclick="adicionarVagaForm()">
+            💾 Salvar e Adicionar Novo
+        </button>
+        <button class="btn-adicionar" onclick="adicionarLinhaFormulario('vagas')" style="background: #6c757d;">
+            ➕ Nova Linha em Branco
+        </button>
+    </div>
+    
+    <div class="controles-filtro">
+        <input type="text" id="filtroProfissionais" placeholder="Filtrar por empresa ou vaga..." 
+               onkeyup="filtrarTabela('filtroProfissionais', 'tabelaProfissionais')">
+        <div>
+            <button class="btn-filtro ativo" onclick="filtrarPorStatus('todos', 'vagas')">Todos</button>
+            <button class="btn-filtro" onclick="filtrarPorStatus('aberta', 'vagas')">Abertas</button>
+            <button class="btn-filtro" onclick="filtrarPorStatus('fechada', 'vagas')">Fechadas</button>
+        </div>
+    </div>
+    
+    <table id="tabelaProfissionais">
+        <thead>
+            <tr>
+                <th>NOME DA EMPRESA</th>
+                <th>VAGA</th>
+                <th>STATUS</th>
+                <th>Candidatos Compatíveis</th>
+                <th>Última Atualização</th>
+                <th class="editor-only">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="corpoTabelaProfissionais">
+        </tbody>
+    </table>
+</div>
+
+<!-- MATCHING AUTOMÁTICO -->
+<div class="painel">
+    <h2>🔗 Matching Automático Vaga x Profissional</h2>
+    
+    <div class="controles-filtro">
+        <input type="text" id="filtroMatching" placeholder="Filtrar por cargo, nome ou empresa..." 
+               onkeyup="filtrarTabela('filtroMatching', 'tabelaMatching')">
+        
+        <div>
+            <button class="btn-filtro ativo" onclick="filtrarMatchingPorStatus('todos')">Todos</button>
+            <button class="btn-filtro" onclick="filtrarMatchingPorStatus('alta')">Alta Compat.</button>
+            <button class="btn-filtro" onclick="filtrarMatchingPorStatus('disponivel')">Disponíveis</button>
+        </div>
+        
+        <button class="btn-atualizar editor-only" onclick="gerarMatchingAutomatico()">
+            🤖 Gerar Novos Matches
+        </button>
+    </div>
+    
+    <table id="tabelaMatching">
+        <thead>
+            <tr>
+                <th>Profissional</th>
+                <th>Cargo do Profissional</th>
+                <th>Vaga</th>
+                <th>Empresa</th>
+                <th>Compatibilidade</th>
+                <th>Status</th>
+                <th class="editor-only">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="corpoMatching">
+        </tbody>
+    </table>
+</div>
+
+</div> <!-- FIM DO CONTEÚDO PRINCIPAL -->
+
+<script>
+// ===== SISTEMA COMPLETO DE USUÁRIOS DO PRIMEIRO CÓDIGO =====
+let usuarios = {};
+let usuarioLogado = null;
+let nivelUsuario = null;
+
+// ===== USUÁRIO MESTRE RICARDO.ARTUR =====
+const USUARIO_MESTRE = {
+    email: 'ricardorarf@gmail.com',
+    usuario: 'ricardo.artur',
+    senha: 'maria12!@',
+    nome: 'Ricardo',
+    sobrenome: 'Artur',
+    nivel: 'admin',
+    dataCadastro: new Date().toISOString(),
+    ativo: true
+};
+
+// Usuário admin inicial
+const ADMIN_INICIAL = {
+    email: 'admin@sistema.com',
+    usuario: 'admin.sistema',
+    senha: 'admin123',
+    nome: 'Admin',
+    sobrenome: 'Sistema',
+    nivel: 'admin',
+    dataCadastro: new Date().toISOString(),
+    ativo: true
+};
+
+// ===== INICIALIZAÇÃO =====
+function inicializarSistema() {
+    carregarUsuarios();
+    verificarLogin();
+}
+
+function carregarUsuarios() {
+    const usuariosSalvos = localStorage.getItem('sistemaUsuarios');
+    
+    if (!usuariosSalvos) {
+        // Primeiro acesso - criar usuários iniciais
+        usuarios = {
+            [USUARIO_MESTRE.email]: USUARIO_MESTRE,
+            [ADMIN_INICIAL.email]: ADMIN_INICIAL
+        };
+        salvarUsuarios();
+        
+        // Criar alguns usuários de exemplo
+        criarUsuarioExemplo('editor@sistema.com', 'editor.sistema', 'Editor', 'Sistema', 'editor', 'editor123');
+        criarUsuarioExemplo('viewer@sistema.com', 'viewer.sistema', 'Visualizador', 'Sistema', 'viewer', 'viewer123');
+    } else {
+        usuarios = JSON.parse(usuariosSalvos);
+    }
+}
+
+function criarUsuarioExemplo(email, usuario, nome, sobrenome, nivel, senha) {
+    if (!usuarios[email]) {
+        usuarios[email] = {
+            email: email,
+            usuario: usuario,
+            senha: senha,
+            nome: nome,
+            sobrenome: sobrenome,
+            nivel: nivel,
+            dataCadastro: new Date().toISOString(),
+            ativo: true
+        };
+        salvarUsuarios();
+    }
+}
+
+function salvarUsuarios() {
+    localStorage.setItem('sistemaUsuarios', JSON.stringify(usuarios));
+}
+
+// ===== SISTEMA DE AUTENTICAÇÃO (LOGIN COM EMAIL OU USUÁRIO) =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar eventos do formulário de login
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        fazerLogin();
+    });
+    
+    // Configurar eventos do formulário de cadastro
+    document.getElementById('cadastroForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        cadastrarUsuario();
+    });
+    
+    // Verificar se já está logado
+    const usuarioSalvo = localStorage.getItem('usuarioLogado');
+    const nivelSalvo = localStorage.getItem('nivelUsuario');
+    
+    if (usuarioSalvo && nivelSalvo) {
+        // Tentar encontrar o usuário por email ou nome de usuário
+        let usuarioEncontrado = null;
+        
+        // Primeiro procura por email
+        usuarioEncontrado = usuarios[usuarioSalvo];
+        
+        // Se não encontrou por email, procura por nome de usuário
+        if (!usuarioEncontrado) {
+            Object.values(usuarios).forEach(usuario => {
+                if (usuario.usuario === usuarioSalvo) {
+                    usuarioEncontrado = usuario;
+                }
+            });
+        }
+        
+        if (usuarioEncontrado && usuarioEncontrado.ativo) {
+            fazerLoginAutomatico(usuarioEncontrado.email, nivelSalvo);
+        } else {
+            mostrarTelaLogin();
+        }
+    } else {
+        mostrarTelaLogin();
+    }
+});
+
+function fazerLogin() {
+    const identificacao = document.getElementById('username').value.trim().toLowerCase();
+    const senha = document.getElementById('password').value;
+    
+    if (!identificacao || !senha) {
+        alert('⚠️ Por favor, preencha email/usuário e senha!');
+        return;
+    }
+    
+    // Procurar usuário por email ou nome de usuário
+    let usuario = null;
+    
+    // Primeiro tenta pelo email
+    usuario = usuarios[identificacao];
+    
+    // Se não encontrou por email, tenta pelo nome de usuário
+    if (!usuario) {
+        Object.values(usuarios).forEach(u => {
+            if (u.usuario && u.usuario.toLowerCase() === identificacao) {
+                usuario = u;
+            }
+        });
+    }
+    
+    if (!usuario) {
+        alert('❌ Usuário não encontrado!');
+        return;
+    }
+    
+    if (!usuario.ativo) {
+        alert('❌ Esta conta está desativada!');
+        return;
+    }
+    
+    // Verificar senha
+    if (usuario.senha !== senha) {
+        alert('❌ Senha incorreta!');
+        return;
+    }
+    
+    // Login bem sucedido
+    usuarioLogado = usuario.email;
+    nivelUsuario = usuario.nivel;
+    
+    // Salvar no localStorage
+    localStorage.setItem('usuarioLogado', usuario.email);
+    localStorage.setItem('nivelUsuario', usuario.nivel);
+    
+    // Atualizar interface
+    atualizarInterfaceUsuario();
+    
+    // Carregar dados do painel
+    inicializarPainel();
+    
+    alert(`✅ Bem-vindo, ${usuario.nome} ${usuario.sobrenome}!`);
+}
+
+function fazerLoginAutomatico(email, nivel) {
+    const usuario = usuarios[email];
+    if (!usuario || !usuario.ativo) {
+        mostrarTelaLogin();
+        return;
+    }
+    
+    usuarioLogado = email;
+    nivelUsuario = nivel;
+    
+    atualizarInterfaceUsuario();
+    inicializarPainel();
+}
+
+function mostrarTelaLogin() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('conteudoPrincipal').style.display = 'none';
+    document.getElementById('userInfoBar').style.display = 'none';
+}
+
+function mostrarCadastro() {
+    document.getElementById('cadastroModal').style.display = 'flex';
+}
+
+function fecharCadastro() {
+    document.getElementById('cadastroModal').style.display = 'none';
+    document.getElementById('cadastroForm').reset();
+}
+
+function mostrarCredenciaisPadrao() {
+    alert(`Usuários para teste rápido:\n\n👑 Ricardo (Admin Mestre):\nUsuário: ricardo.artur\nSenha: maria12!@\n\n👑 Administrador:\nUsuário: admin.sistema\nSenha: admin123\n\n👨‍💼 Editor:\nUsuário: editor.sistema\nSenha: editor123\n\n👁️ Visualizador:\nUsuário: viewer.sistema\nSenha: viewer123`);
+}
+
+// ===== CADASTRO DE USUÁRIOS =====
+function cadastrarUsuario() {
+    const nome = document.getElementById('novoNome').value.trim();
+    const sobrenome = document.getElementById('novoSobrenome').value.trim();
+    const email = document.getElementById('novoEmail').value.trim().toLowerCase();
+    const senha = document.getElementById('novaSenha').value;
+    const confirmarSenha = document.getElementById('confirmarSenha').value;
+    const nivel = document.getElementById('novoTipo').value;
+    
+    // Validações
+    if (!nome || !sobrenome) {
+        alert('⚠️ Por favor, preencha nome e sobrenome!');
+        return;
+    }
+    
+    if (!email || !validarEmail(email)) {
+        alert('⚠️ Por favor, informe um email válido!');
+        return;
+    }
+    
+    if (usuarios[email]) {
+        alert('❌ Este email já está cadastrado!');
+        return;
+    }
+    
+    if (senha.length < 6) {
+        alert('⚠️ A senha deve ter pelo menos 6 caracteres!');
+        return;
+    }
+    
+    if (senha !== confirmarSenha) {
+        alert('❌ As senhas não coincidem!');
+        return;
+    }
+    
+    // Criar nome de usuário no formato nome.sobrenome
+    const usuarioFormatado = `${nome.toLowerCase()}.${sobrenome.toLowerCase()}`;
+    
+    // Verificar se o nome de usuário já existe
+    let usuarioExiste = false;
+    Object.values(usuarios).forEach(u => {
+        if (u.usuario === usuarioFormatado) {
+            usuarioExiste = true;
+        }
+    });
+    
+    if (usuarioExiste) {
+        alert('❌ Já existe um usuário com este nome e sobrenome!');
+        return;
+    }
+    
+    // Criar novo usuário
+    usuarios[email] = {
+        email: email,
+        usuario: usuarioFormatado,
+        senha: senha,
+        nome: nome,
+        sobrenome: sobrenome,
+        nivel: nivel,
+        dataCadastro: new Date().toISOString(),
+        ativo: true
+    };
+    
+    salvarUsuarios();
+    
+    // Limpar formulário
+    document.getElementById('cadastroForm').reset();
+    
+    alert(`✅ Usuário ${nome} ${sobrenome} cadastrado com sucesso!\n\n📧 Email: ${email}\n👤 Usuário: ${usuarioFormatado}\n🔐 Nível: ${nivel}\n\nAgora faça login com email ou usuário (${usuarioFormatado})!`);
+    
+    fecharCadastro();
+    document.getElementById('username').value = email;
+    document.getElementById('username').focus();
+}
+
+function validarEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+if (usuarioLogado && usuarios[usuarioLogado]?.nivel === 'admin') {
+    carregarListaUsuarios();
+}
+// ===== FUNÇÕES DO USUÁRIO LOGADO =====
+function atualizarInterfaceUsuario() {
+    const usuario = usuarios[usuarioLogado];
+    
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('conteudoPrincipal').style.display = 'block';
+    document.getElementById('userInfoBar').style.display = 'flex';
+    
+    document.getElementById('currentUserName').textContent = `${usuario.nome} ${usuario.sobrenome}`;
+    document.getElementById('currentUserRole').textContent = 
+        usuario.nivel === 'admin' ? 'ADMIN' : 
+        usuario.nivel === 'editor' ? 'EDITOR' : 'VISUALIZADOR';
+    document.getElementById('currentUserRole').className = `current-user-role ${usuario.nivel}`;
+    
+    // Mostrar/ocultar controles baseados no nível
+    atualizarControlesUsuario();
+    
+    // Se for admin, mostrar painel de administração de usuários
+    if (usuario.nivel === 'admin') {
+        document.getElementById('adminUsersPanel').style.display = 'block';
+        carregarListaUsuarios();
+    } else {
+        document.getElementById('adminUsersPanel').style.display = 'none';
+    }
+}
+
+function atualizarControlesUsuario() {
+    const adminControls = document.querySelectorAll('.admin-only');
+    const editorControls = document.querySelectorAll('.editor-only');
+    
+    if (nivelUsuario === 'admin') {
+        adminControls.forEach(el => el.style.display = 'inline-block');
+        editorControls.forEach(el => el.style.display = 'inline-block');
+    } else if (nivelUsuario === 'editor') {
+        adminControls.forEach(el => el.style.display = 'none');
+        editorControls.forEach(el => el.style.display = 'inline-block');
+    } else {
+        adminControls.forEach(el => el.style.display = 'none');
+        editorControls.forEach(el => el.style.display = 'none');
+    }
+}
+
+function fazerLogout() {
+    if (confirm('Deseja realmente sair do sistema?')) {
+        usuarioLogado = null;
+        nivelUsuario = null;
+        localStorage.removeItem('usuarioLogado');
+        localStorage.removeItem('nivelUsuario');
+        
+        mostrarTelaLogin();
+        alert('👋 Você saiu do sistema!');
+    }
+}
+
+// ===== ADMINISTRAÇÃO DE USUÁRIOS =====
+function carregarListaUsuarios() {
+    const lista = document.getElementById('listaUsuarios');
+    lista.innerHTML = '';
+    
+    Object.values(usuarios).forEach(usuario => {
+        const item = document.createElement('div');
+        item.className = 'user-item';
+        
+        item.innerHTML = `
+            <div class="user-info">
+                <div class="user-name">${usuario.nome} ${usuario.sobrenome}</div>
+                <div class="user-email">${usuario.email}</div>
+                <div style="font-size: 11px; color: #6c757d;">
+                    👤 Usuário: ${usuario.usuario || 'N/A'}
+                </div>
+            </div>
+            <span class="user-role-badge ${usuario.nivel}">
+                ${usuario.nivel === 'admin' ? 'ADMIN' : usuario.nivel === 'editor' ? 'EDITOR' : 'VISUALIZADOR'}
+                ${!usuario.ativo ? ' (INATIVO)' : ''}
+            </span>
+            <div class="user-actions">
+                ${usuario.email !== usuarioLogado ? `
+                <button class="user-action-btn edit" onclick="editarUsuario('${usuario.email}')">✏️</button>
+                <button class="user-action-btn reset" onclick="resetarSenhaUsuario('${usuario.email}')">🔑</button>
+                <button class="user-action-btn ${usuario.ativo ? 'delete' : 'edit'}" 
+                        onclick="${usuario.ativo ? 'desativarUsuario' : 'ativarUsuario'}('${usuario.email}')">
+                    ${usuario.ativo ? '❌' : '✅'}
+                </button>
+                ` : ''}
+            </div>
+        `;
+        
+        lista.appendChild(item);
+    });
+}
+
+function criarNovoUsuario() {
+    const nome = document.getElementById('novoUsuarioNome').value.trim();
+    const sobrenome = document.getElementById('novoUsuarioSobrenome').value.trim();
+    const email = document.getElementById('novoUsuarioEmail').value.trim().toLowerCase();
+    const nivel = document.getElementById('novoUsuarioNivel').value;
+    
+    if (!nome || !sobrenome) {
+        alert('⚠️ Por favor, preencha nome e sobrenome!');
+        return;
+    }
+    
+    if (!email || !validarEmail(email)) {
+        alert('⚠️ Por favor, informe um email válido!');
+        return;
+    }
+    
+    if (usuarios[email]) {
+        alert('❌ Este email já está cadastrado!');
+        return;
+    }
+    
+    // Gerar senha inicial
+    const senhaInicial = gerarSenhaAleatoria(8);
+    
+    // Criar nome de usuário no formato nome.sobrenome
+    const usuarioFormatado = `${nome.toLowerCase()}.${sobrenome.toLowerCase()}`;
+    
+    // Verificar se o nome de usuário já existe
+    let usuarioExiste = false;
+    Object.values(usuarios).forEach(u => {
+        if (u.usuario === usuarioFormatado) {
+            usuarioExiste = true;
+        }
+    });
+    
+    if (usuarioExiste) {
+        alert('❌ Já existe um usuário com este nome e sobrenome!');
+        return;
+    }
+    
+    // Criar usuário
+    usuarios[email] = {
+        email: email,
+        usuario: usuarioFormatado,
+        senha: senhaInicial,
+        nome: nome,
+        sobrenome: sobrenome,
+        nivel: nivel,
+        dataCadastro: new Date().toISOString(),
+        ativo: true
+    };
+    
+    salvarUsuarios();
+    carregarListaUsuarios();
+    
+    // Limpar formulário
+    document.getElementById('novoUsuarioNome').value = '';
+    document.getElementById('novoUsuarioSobrenome').value = '';
+    document.getElementById('novoUsuarioEmail').value = '';
+    
+    alert(`✅ Usuário criado com sucesso!\n\n👤 ${nome} ${sobrenome}\n📧 ${email}\n👤 Usuário: ${usuarioFormatado}\n🔑 Senha inicial: ${senhaInicial}\n\n⚠️ Informe ao usuário para alterar a senha no primeiro acesso.`);
+}
+
+function editarUsuario(email) {
+    const usuario = usuarios[email];
+    if (!usuario) return;
+    
+    const novoNome = prompt('Editar Nome:', usuario.nome);
+    if (novoNome === null) return;
+    
+    const novoSobrenome = prompt('Editar Sobrenome:', usuario.sobrenome);
+    if (novoSobrenome === null) return;
+    
+    const novoNivel = prompt('Editar Nível (admin/editor/viewer):', usuario.nivel);
+    if (novoNivel === null) return;
+    
+    if (novoNome && novoSobrenome && ['admin', 'editor', 'viewer'].includes(novoNivel)) {
+        // Atualizar nome de usuário se nome ou sobrenome mudaram
+        if (novoNome !== usuario.nome || novoSobrenome !== usuario.sobrenome) {
+            const novoUsuarioFormatado = `${novoNome.toLowerCase()}.${novoSobrenome.toLowerCase()}`;
+            
+            // Verificar se o novo nome de usuário já existe
+            let usuarioExiste = false;
+            Object.values(usuarios).forEach(u => {
+                if (u.email !== email && u.usuario === novoUsuarioFormatado) {
+                    usuarioExiste = true;
+                }
+            });
+            
+            if (usuarioExiste) {
+                alert('❌ Já existe outro usuário com este nome e sobrenome!');
+                return;
+            }
+            
+            usuario.usuario = novoUsuarioFormatado;
+        }
+        
+        usuario.nome = novoNome;
+        usuario.sobrenome = novoSobrenome;
+        usuario.nivel = novoNivel;
+        
+        salvarUsuarios();
+        carregarListaUsuarios();
+        
+        // Se o usuário editado for o logado, atualizar interface
+        if (email === usuarioLogado) {
+            nivelUsuario = novoNivel;
+            atualizarControlesUsuario();
+        }
+        
+        alert('✅ Usuário atualizado com sucesso!');
+    }
+}
+
+function resetarSenhaUsuario(email) {
+    if (!confirm('Deseja resetar a senha deste usuário?')) return;
+    
+    const novaSenha = gerarSenhaAleatoria(8);
+    usuarios[email].senha = novaSenha;
+    
+    salvarUsuarios();
+    alert(`✅ Senha resetada para: ${novaSenha}\n\nInforme ao usuário.`);
+}
+
+function desativarUsuario(email) {
+    if (!confirm('Deseja desativar este usuário?')) return;
+    
+    usuarios[email].ativo = false;
+    salvarUsuarios();
+    carregarListaUsuarios();
+    
+    alert('✅ Usuário desativado!');
+}
+
+function ativarUsuario(email) {
+    usuarios[email].ativo = true;
+    salvarUsuarios();
+    carregarListaUsuarios();
+    
+    alert('✅ Usuário ativado!');
+}
+
+function gerarSenhaAleatoria(tamanho) {
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let senha = '';
+    for (let i = 0; i < tamanho; i++) {
+        senha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+    }
+    return senha;
+}
+
+// ===== INICIALIZAÇÃO DO PAINEL (DO PRIMEIRO CÓDIGO) =====
+let profissionais = [];
+let vagas = [];
+let matches = [];
+let arrastando = false;
+let offsetX = 0, offsetY = 0;
+
+function inicializarPainel() {
+    carregarDadosSistema();
+    renderizarTabelaProfissionais();
+    renderizarTabelaVagas();
+    gerarMatchingAutomatico();
+    atualizarContadores();
+    
+    const titulo = document.getElementById('titulo');
+    titulo.addEventListener('mousedown', iniciarArrasto);
+    document.addEventListener('mousemove', moverElemento);
+    document.addEventListener('mouseup', pararArrasto);
+    
+    adicionarLinhaFormulario('profissionais');
+    adicionarLinhaFormulario('vagas');
+}
+
+function carregarDadosSistema() {
+    const profissionaisSalvos = localStorage.getItem('profissionais');
+    if (profissionaisSalvos) {
+        profissionais = JSON.parse(profissionaisSalvos);
+    } else {
+        profissionais = [
+            { 
+                id: 1, 
+                nome: "João Silva", 
+                cargo: "Gerente de Cobrança", 
+                empresaAnt: "Cooperativa X", 
+                disponibilidade: "Disponível", 
+                novaEmpresa: "-",
+                dataAtualizacao: getDataAtualFormatada(),
+                usuarioAtualizacao: "Sistema"
+            },
+            { 
+                id: 2, 
+                nome: "Maria Santos", 
+                cargo: "Diretora Financeira", 
+                empresaAnt: "Banco Y", 
+                disponibilidade: "Em processo", 
+                novaEmpresa: "Empresa A",
+                dataAtualizacao: getDataAtualFormatada(),
+                usuarioAtualizacao: "Sistema"
+            },
+            { 
+                id: 3, 
+                nome: "Carlos Oliveira", 
+                cargo: "Analista de Crédito", 
+                empresaAnt: "Financeira Z", 
+                disponibilidade: "Disponível", 
+                novaEmpresa: "-",
+                dataAtualizacao: getDataAtualFormatada(),
+                usuarioAtualizacao: "Sistema"
+            },
+            { 
+                id: 4, 
+                nome: "Ana Costa", 
+                cargo: "Supervisora de Cobrança", 
+                empresaAnt: "Empresa W", 
+                disponibilidade: "Disponível", 
+                novaEmpresa: "-",
+                dataAtualizacao: getDataAtualFormatada(),
+                usuarioAtualizacao: "Sistema"
+            }
+        ];
+        salvarProfissionais();
+    }
+    
+    const vagasSalvas = localStorage.getItem('vagas');
+    if (vagasSalvas) {
+        vagas = JSON.parse(vagasSalvas);
+    } else {
+        vagas = [
+            { 
+                id: "v1", 
+                empresa: "Cooperativa X", 
+                vaga: "Gerente de Cobrança", 
+                status: "Aberta",
+                dataAtualizacao: getDataAtualFormatada(),
+                usuarioAtualizacao: "Sistema"
+            },
+            { 
+                id: "v2", 
+                empresa: "Banco Y", 
+                vaga: "Diretor Financeiro", 
+                status: "Em análise",
+                dataAtualizacao: getDataAtualFormatada(),
+                usuarioAtualizacao: "Sistema"
+            },
+            { 
+                id: "v3", 
+                empresa: "Empresa Z", 
+                vaga: "Analista de Crédito", 
+                status: "Aberta",
+                dataAtualizacao: getDataAtualFormatada(),
+                usuarioAtualizacao: "Sistema"
+            },
+            { 
+                id: "v4", 
+                empresa: "Financeira A", 
+                vaga: "Coordenadora de Cobrança", 
+                status: "Aberta",
+                dataAtualizacao: getDataAtualFormatada(),
+                usuarioAtualizacao: "Sistema"
+            }
+        ];
+        salvarVagas();
+    }
+    
+    const matchesSalvos = localStorage.getItem('matches');
+    if (matchesSalvos) {
+        matches = JSON.parse(matchesSalvos);
+    }
+}
+
+function salvarProfissionais() {
+    localStorage.setItem('profissionais', JSON.stringify(profissionais));
+}
+
+function salvarVagas() {
+    localStorage.setItem('vagas', JSON.stringify(vagas));
+}
+
+function salvarMatches() {
+    localStorage.setItem('matches', JSON.stringify(matches));
+}
+
+// ===== FUNÇÕES DO PAINEL =====
+function podeEditar() {
+    return nivelUsuario === 'admin' || nivelUsuario === 'editor';
+}
+
+function podeAdministrar() {
+    return nivelUsuario === 'admin';
+}
+
+function toggleFormulario(formId) {
+    if (formId === 'formNovoUsuario' && !podeAdministrar()) {
+        alert('⚠️ Apenas administradores podem gerenciar usuários!');
+        return;
+    }
+    
+    if ((formId === 'formProfissionais' || formId === 'formVagas') && !podeEditar()) {
+        alert('⚠️ Você não tem permissão para adicionar registros!');
+        return;
+    }
+    
+    const form = document.getElementById(formId);
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function getDataAtualFormatada() {
+    const agora = new Date();
+    const dia = String(agora.getDate()).padStart(2, '0');
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const ano = agora.getFullYear();
+    const horas = String(agora.getHours()).padStart(2, '0');
+    const minutos = String(agora.getMinutes()).padStart(2, '0');
+    return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+}
+
+function iniciarArrasto(e) {
+    if (e.target.closest('.titulo-container')) {
+        arrastando = true;
+        const titulo = document.getElementById('titulo');
+        offsetX = e.clientX - titulo.getBoundingClientRect().left;
+        offsetY = e.clientY - titulo.getBoundingClientRect().top;
+        titulo.style.cursor = 'grabbing';
+    }
+}
+
+function moverElemento(e) {
+    if (arrastando) {
+        const titulo = document.getElementById('titulo');
+        titulo.style.left = (e.clientX - offsetX) + 'px';
+        titulo.style.top = (e.clientY - offsetY) + 'px';
+    }
+}
+
+function pararArrasto() {
+    arrastando = false;
+    const titulo = document.getElementById('titulo');
+    if (titulo) {
+        titulo.style.cursor = 'move';
+    }
+}
+
+// ===== FUNÇÕES PARA ADICIONAR REGISTROS =====
+function adicionarProfissionalForm() {
+    if (!podeEditar()) {
+        alert('⚠️ Você não tem permissão para adicionar registros!');
+        return;
+    }
+    
+    const linhas = document.querySelectorAll('#linhasFormProfissionais .linha-formulario');
+    let algumPreenchido = false;
+    
+    linhas.forEach(linha => {
+        const inputs = linha.querySelectorAll('input, select');
+        const valores = Array.from(inputs).map(input => input.value.trim());
+        
+        // Verifica se pelo menos o nome está preenchido
+        if (valores[0]) {
+            algumPreenchido = true;
+            
+            const novoId = profissionais.length > 0 ? Math.max(...profissionais.map(p => p.id)) + 1 : 1;
+            const novoProfissional = {
+                id: novoId,
+                nome: valores[0] || '',
+                cargo: valores[1] || '',
+                empresaAnt: valores[2] || '',
+                disponibilidade: valores[3] || 'Disponível',
+                novaEmpresa: '-',
+                dataAtualizacao: getDataAtualFormatada(),
+                usuarioAtualizacao: usuarios[usuarioLogado] ? `${usuarios[usuarioLogado].nome} ${usuarios[usuarioLogado].sobrenome}` : 'Usuário'
+            };
+            
+            profissionais.push(novoProfissional);
+            
+            // Limpar os campos
+            inputs.forEach(input => {
+                if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 0;
+                } else {
+                    input.value = '';
+                }
+            });
+        }
+    });
+    
+    if (!algumPreenchido) {
+        alert('⚠️ Por favor, preencha pelo menos o nome do profissional!');
+        return;
+    }
+    
+    salvarProfissionais();
+    renderizarTabelaProfissionais();
+    atualizarContadores();
+    gerarMatchingAutomatico();
+    
+    alert('✅ Profissional(ais) adicionado(s) com sucesso!');
+}
+
+function adicionarVagaForm() {
+    if (!podeEditar()) {
+        alert('⚠️ Você não tem permissão para adicionar registros!');
+        return;
+    }
+    
+    const linhas = document.querySelectorAll('#linhasFormVagas .linha-formulario');
+    let algumPreenchido = false;
+    
+    linhas.forEach(linha => {
+        const inputs = linha.querySelectorAll('input, select');
+        const valores = Array.from(inputs).map(input => input.value.trim());
+        
+        // Verifica se pelo menos a empresa está preenchida
+        if (valores[0]) {
+            algumPreenchido = true;
+            
+            const novoId = 'v' + (vagas.length > 0 ? Math.max(...vagas.map(v => parseInt(v.id.substring(1)))) + 1 : 1);
+            const novaVaga = {
+                id: novoId,
+                empresa: valores[0] || '',
+                vaga: valores[1] || '',
+                status: valores[2] || 'Aberta',
+                dataAtualizacao: getDataAtualFormatada(),
+                usuarioAtualizacao: usuarios[usuarioLogado] ? `${usuarios[usuarioLogado].nome} ${usuarios[usuarioLogado].sobrenome}` : 'Usuário'
+            };
+            
+            vagas.push(novaVaga);
+            
+            // Limpar os campos
+            inputs.forEach(input => {
+                if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 0;
+                } else {
+                    input.value = '';
+                }
+            });
+        }
+    });
+    
+    if (!algumPreenchido) {
+        alert('⚠️ Por favor, preencha pelo menos o nome da empresa!');
+        return;
+    }
+    
+    salvarVagas();
+    renderizarTabelaVagas();
+    atualizarContadores();
+    gerarMatchingAutomatico();
+    
+    alert('✅ Vaga(s) adicionada(s) com sucesso!');
+}
+
+function adicionarLinhaFormulario(tipo) {
+    let containerId, campos;
+    
+    if (tipo === 'profissionais') {
+        containerId = 'linhasFormProfissionais';
+        campos = `
+            <div class="linha-formulario">
+                <div>
+                    <label>Nome Completo:</label>
+                    <input type="text" placeholder="Digite o nome do profissional">
+                </div>
+                <div>
+                    <label>Cargo:</label>
+                    <input type="text" placeholder="Ex: Gerente de Cobrança">
+                </div>
+                <div>
+                    <label>Empresa Anterior:</label>
+                    <input type="text" placeholder="Nome da última empresa">
+                </div>
+                <div>
+                    <label>Disponibilidade:</label>
+                    <select>
+                        <option value="Disponível">Disponível</option>
+                        <option value="Em processo">Em processo</option>
+                        <option value="Contratado">Contratado</option>
+                    </select>
+                </div>
+            </div>
+        `;
+    } else {
+        containerId = 'linhasFormVagas';
+        campos = `
+            <div class="linha-formulario">
+                <div>
+                    <label>Nome da Empresa:</label>
+                    <input type="text" placeholder="Digite o nome da empresa">
+                </div>
+                <div>
+                    <label>Vaga/Cargo:</label>
+                    <input type="text" placeholder="Ex: Gerente de Cobrança">
+                </div>
+                <div>
+                    <label>Status:</label>
+                    <select>
+                        <option value="Aberta">Aberta</option>
+                        <option value="Em análise">Em análise</option>
+                        <option value="Fechada">Fechada</option>
+                    </select>
+                </div>
+            </div>
+        `;
+    }
+    
+    const container = document.getElementById(containerId);
+    const div = document.createElement('div');
+    div.innerHTML = campos;
+    container.appendChild(div);
+}
+
+// ===== FUNÇÕES DE RENDERIZAÇÃO DAS TABELAS =====
+function renderizarTabelaProfissionais() {
+    const tbody = document.getElementById('corpoTabelaVagas');
+    tbody.innerHTML = '';
+    
+    profissionais.forEach(prof => {
+        const tr = document.createElement('tr');
+        
+        let scores = [];
+        vagas.forEach(vaga => {
+            if (vaga.status.includes('Aberta')) {
+                const score = calcularScoreCompatibilidade(prof.cargo, vaga.vaga);
+                scores.push(score);
+            }
+        });
+        
+        let compatibilidadeTexto = '0%';
+        let compatibilidadeMedia = 0;
+        if (scores.length > 0) {
+            compatibilidadeMedia = scores.reduce((a, b) => a + b, 0) / scores.length;
+            compatibilidadeTexto = Math.round(compatibilidadeMedia * 100) + '%';
+        }
+        
+        let compatibilidadeClass = 'compatibilidade-baixa';
+        if (compatibilidadeMedia >= 0.7) compatibilidadeClass = 'compatibilidade-alta';
+        else if (compatibilidadeMedia >= 0.4) compatibilidadeClass = 'compatibilidade-media';
+        
+        let statusClass = '';
+        if (prof.disponibilidade.includes('Disponível')) statusClass = 'status-disponivel';
+        else if (prof.disponibilidade.includes('Em processo') || prof.disponibilidade.includes('Em análise')) statusClass = 'status-analise';
+        else if (prof.disponibilidade.includes('Contratado')) statusClass = 'status-contratado';
+        
+        let dataFormatada = prof.dataAtualizacao || '';
+        if (prof.usuarioAtualizacao && !dataFormatada.includes(prof.usuarioAtualizacao)) {
+            dataFormatada += ` - ${prof.usuarioAtualizacao}`;
+        }
+        
+        const podeEditarUsuario = podeEditar();
+        const onclickEditar = podeEditarUsuario ? `onclick="editarCampo('nome', ${prof.id})"` : '';
+        const onclickCargo = podeEditarUsuario ? `onclick="editarCampo('cargo', ${prof.id})"` : '';
+        const onclickEmpresaAnt = podeEditarUsuario ? `onclick="editarCampo('empresaAnt', ${prof.id})"` : '';
+        const onclickDisponibilidade = podeEditarUsuario ? `onclick="editarCampo('disponibilidade', ${prof.id})"` : '';
+        const onclickNovaEmpresa = podeEditarUsuario ? `onclick="editarCampo('novaEmpresa', ${prof.id})"` : '';
+        
+        tr.innerHTML = `
+            <td class="editable-cell" ${onclickEditar}>${prof.nome || ''}</td>
+            <td class="editable-cell" ${onclickCargo}>${prof.cargo || ''}</td>
+            <td class="editable-cell" ${onclickEmpresaAnt}>${prof.empresaAnt || ''}</td>
+            <td class="editable-cell" ${onclickDisponibilidade}>
+                <span class="${statusClass}">${prof.disponibilidade || ''}</span>
+            </td>
+            <td class="nova-empresa-cell editable-cell" ${onclickNovaEmpresa}>
+                ${prof.novaEmpresa || '-'}
+                ${podeEditarUsuario ? '<span class="edit-icon">✏️</span>' : ''}
+            </td>
+            <td>
+                <span class="${compatibilidadeClass}">${compatibilidadeTexto}</span>
+            </td>
+            <td class="data-atualizacao-cell">
+                <div class="data-atualizacao">
+                    ${dataFormatada}
+                </div>
+                ${podeEditarUsuario ? `
+                <button class="btn-atualizar-data" onclick="atualizarDataRegistro('profissionais', ${prof.id})">
+                    Atualizar Data
+                </button>` : ''}
+            </td>
+            ${podeEditarUsuario ? `
+            <td>
+                <button class="acao-btn acao-editar" onclick="editarProfissionalCompleto(${prof.id})">
+                    ✏️ Editar
+                </button>
+                <button class="acao-btn acao-excluir" onclick="excluirProfissional(${prof.id})">
+                    🗑️ Excluir
+                </button>
+            </td>` : '<td></td>'}
+        `;
+        
+        tbody.appendChild(tr);
+    });
+    
+    // Atualizar contador
+    document.getElementById('contadorProfissionais').textContent = profissionais.length;
+}
+
+function renderizarTabelaVagas() {
+    const tbody = document.getElementById('corpoTabelaProfissionais');
+    tbody.innerHTML = '';
+    
+    vagas.forEach(vaga => {
+        const tr = document.createElement('tr');
+        
+        // Encontrar candidatos compatíveis
+        let candidatosCompativeis = [];
+        profissionais.forEach(prof => {
+            const score = calcularScoreCompatibilidade(prof.cargo, vaga.vaga);
+            if (score >= 0.4 && prof.disponibilidade.includes('Disponível')) {
+                candidatosCompativeis.push({
+                    nome: prof.nome,
+                    score: score
+                });
+            }
+        });
+        
+        // Ordenar por compatibilidade
+        candidatosCompativeis.sort((a, b) => b.score - a.score);
+        
+        let candidatosHTML = '';
+        if (candidatosCompativeis.length > 0) {
+            candidatosHTML = candidatosCompativeis.slice(0, 3).map(cand => {
+                const porcentagem = Math.round(cand.score * 100);
+                return `<div class="match-item">${cand.nome} (${porcentagem}%)</div>`;
+            }).join('');
+            if (candidatosCompativeis.length > 3) {
+                candidatosHTML += `<div class="match-item">+ ${candidatosCompativeis.length - 3} outros</div>`;
+            }
+        } else {
+            candidatosHTML = '<div class="match-item">Nenhum candidato compatível</div>';
+        }
+        
+        let dataFormatada = vaga.dataAtualizacao || '';
+        if (vaga.usuarioAtualizacao && !dataFormatada.includes(vaga.usuarioAtualizacao)) {
+            dataFormatada += ` - ${vaga.usuarioAtualizacao}`;
+        }
+        
+        const podeEditarUsuario = podeEditar();
+        
+        tr.innerHTML = `
+            <td class="editable-cell" ${podeEditarUsuario ? `onclick="editarCampoVaga('empresa', '${vaga.id}')"` : ''}>${vaga.empresa || ''}</td>
+            <td class="editable-cell" ${podeEditarUsuario ? `onclick="editarCampoVaga('vaga', '${vaga.id}')"` : ''}>${vaga.vaga || ''}</td>
+            <td class="editable-cell" ${podeEditarUsuario ? `onclick="editarCampoVaga('status', '${vaga.id}')"` : ''}>${vaga.status || ''}</td>
+            <td>${candidatosHTML}</td>
+            <td class="data-atualizacao-cell">
+                <div class="data-atualizacao">
+                    ${dataFormatada}
+                </div>
+                ${podeEditarUsuario ? `
+                <button class="btn-atualizar-data" onclick="atualizarDataRegistro('vagas', '${vaga.id}')">
+                    Atualizar Data
+                </button>` : ''}
+            </td>
+            ${podeEditarUsuario ? `
+            <td>
+                <button class="acao-btn acao-editar" onclick="editarVagaCompleta('${vaga.id}')">
+                    ✏️ Editar
+                </button>
+                <button class="acao-btn acao-excluir" onclick="excluirVaga('${vaga.id}')">
+                    🗑️ Excluir
+                </button>
+            </td>` : '<td></td>'}
+        `;
+        
+        tbody.appendChild(tr);
+    });
+    
+    // Atualizar contador
+    document.getElementById('contadorVagas').textContent = vagas.length;
+}
+
+function calcularScoreCompatibilidade(cargoProfissional, cargoVaga) {
+    if (!cargoProfissional || !cargoVaga) return 0;
+    
+    const cargoProf = cargoProfissional.toLowerCase();
+    const cargoV = cargoVaga.toLowerCase();
+    
+    // Palavras-chave para matching
+    const palavrasChave = [
+        { palavras: ['gerente', 'manager', 'gestor'], peso: 1.0 },
+        { palavras: ['diretor', 'director', 'head'], peso: 0.9 },
+        { palavras: ['coordenador', 'coordenadora', 'coordinator'], peso: 0.8 },
+        { palavras: ['supervisor', 'supervisora', 'superintendent'], peso: 0.7 },
+        { palavras: ['analista', 'analyst', 'especialista'], peso: 0.6 },
+        { palavras: ['assistente', 'assistant', 'auxiliar'], peso: 0.5 },
+        { palavras: ['cobrança', 'collections', 'recebíveis'], peso: 1.0 },
+        { palavras: ['crédito', 'credit', 'risk'], peso: 0.9 },
+        { palavras: ['financeiro', 'finance', 'financial'], peso: 0.8 },
+        { palavras: ['contábil', 'accounting', 'contabilidade'], peso: 0.7 },
+        { palavras: ['comercial', 'commercial', 'sales'], peso: 0.6 },
+        { palavras: ['jurídico', 'legal', 'law'], peso: 0.5 }
+    ];
+    
+    let score = 0;
+    let matches = 0;
+    
+    palavrasChave.forEach(grupo => {
+        grupo.palavras.forEach(palavra => {
+            if (cargoProf.includes(palavra) && cargoV.includes(palavra)) {
+                score += grupo.peso;
+                matches++;
+            } else if (cargoProf.includes(palavra) || cargoV.includes(palavra)) {
+                score += grupo.peso * 0.3;
+            }
+        });
+    });
+    
+    // Normalizar score
+    if (matches > 0) {
+        score = score / matches;
+    }
+    
+    // Limitar entre 0 e 1
+    return Math.min(Math.max(score, 0), 1);
+}
+
+function atualizarContadores() {
+    document.getElementById('contadorProfissionais').textContent = profissionais.length;
+    document.getElementById('contadorVagas').textContent = vagas.length;
+}
+
+// ===== FUNÇÕES DE EDIÇÃO E EXCLUSÃO =====
+function editarCampo(tipo, id) {
+    if (!podeEditar()) return;
+    
+    const prof = profissionais.find(p => p.id === id);
+    if (!prof) return;
+    
+    const valorAtual = prof[tipo] || '';
+    const novoValor = prompt(`Editar ${tipo}:`, valorAtual);
+    
+    if (novoValor !== null && novoValor !== valorAtual) {
+        prof[tipo] = novoValor;
+        prof.dataAtualizacao = getDataAtualFormatada();
+        prof.usuarioAtualizacao = usuarios[usuarioLogado] ? `${usuarios[usuarioLogado].nome} ${usuarios[usuarioLogado].sobrenome}` : 'Usuário';
+        
+        salvarProfissionais();
+        renderizarTabelaProfissionais();
+        gerarMatchingAutomatico();
+    }
+}
+
+function editarCampoVaga(tipo, id) {
+    if (!podeEditar()) return;
+    
+    const vaga = vagas.find(v => v.id === id);
+    if (!vaga) return;
+    
+    const valorAtual = vaga[tipo] || '';
+    const novoValor = prompt(`Editar ${tipo}:`, valorAtual);
+    
+    if (novoValor !== null && novoValor !== valorAtual) {
+        vaga[tipo] = novoValor;
+        vaga.dataAtualizacao = getDataAtualFormatada();
+        vaga.usuarioAtualizacao = usuarios[usuarioLogado] ? `${usuarios[usuarioLogado].nome} ${usuarios[usuarioLogado].sobrenome}` : 'Usuário';
+        
+        salvarVagas();
+        renderizarTabelaVagas();
+        gerarMatchingAutomatico();
+    }
+}
+
+function editarProfissionalCompleto(id) {
+    if (!podeEditar()) return;
+    
+    const prof = profissionais.find(p => p.id === id);
+    if (!prof) return;
+    
+    const novoNome = prompt('Editar Nome:', prof.nome || '');
+    if (novoNome === null) return;
+    
+    const novoCargo = prompt('Editar Cargo:', prof.cargo || '');
+    if (novoCargo === null) return;
+    
+    const novaEmpresaAnt = prompt('Editar Empresa Anterior:', prof.empresaAnt || '');
+    if (novaEmpresaAnt === null) return;
+    
+    const novaDisponibilidade = prompt('Editar Disponibilidade (Disponível/Em processo/Contratado):', prof.disponibilidade || '');
+    if (novaDisponibilidade === null) return;
+    
+    const novaEmpresa = prompt('Editar Nova Empresa (deixe em branco para "-"):', prof.novaEmpresa === '-' ? '' : prof.novaEmpresa);
+    if (novaEmpresa === null) return;
+    
+    prof.nome = novoNome;
+    prof.cargo = novoCargo;
+    prof.empresaAnt = novaEmpresaAnt;
+    prof.disponibilidade = novaDisponibilidade;
+    prof.novaEmpresa = novaEmpresa || '-';
+    prof.dataAtualizacao = getDataAtualFormatada();
+    prof.usuarioAtualizacao = usuarios[usuarioLogado] ? `${usuarios[usuarioLogado].nome} ${usuarios[usuarioLogado].sobrenome}` : 'Usuário';
+    
+    salvarProfissionais();
+    renderizarTabelaProfissionais();
+    gerarMatchingAutomatico();
+    
+    alert('✅ Profissional atualizado com sucesso!');
+}
+
+function editarVagaCompleta(id) {
+    if (!podeEditar()) return;
+    
+    const vaga = vagas.find(v => v.id === id);
+    if (!vaga) return;
+    
+    const novaEmpresa = prompt('Editar Empresa:', vaga.empresa || '');
+    if (novaEmpresa === null) return;
+    
+    const novaVaga = prompt('Editar Vaga:', vaga.vaga || '');
+    if (novaVaga === null) return;
+    
+    const novoStatus = prompt('Editar Status (Aberta/Em análise/Fechada):', vaga.status || '');
+    if (novoStatus === null) return;
+    
+    vaga.empresa = novaEmpresa;
+    vaga.vaga = novaVaga;
+    vaga.status = novoStatus;
+    vaga.dataAtualizacao = getDataAtualFormatada();
+    vaga.usuarioAtualizacao = usuarios[usuarioLogado] ? `${usuarios[usuarioLogado].nome} ${usuarios[usuarioLogado].sobrenome}` : 'Usuário';
+    
+    salvarVagas();
+    renderizarTabelaVagas();
+    gerarMatchingAutomatico();
+    
+    alert('✅ Vaga atualizada com sucesso!');
+}
+
+function excluirProfissional(id) {
+    if (!podeEditar()) return;
+    
+    if (confirm('Tem certeza que deseja excluir este profissional?')) {
+        const index = profissionais.findIndex(p => p.id === id);
+        if (index !== -1) {
+            profissionais.splice(index, 1);
+            salvarProfissionais();
+            renderizarTabelaProfissionais();
+            atualizarContadores();
+            gerarMatchingAutomatico();
+            
+            alert('✅ Profissional excluído com sucesso!');
+        }
+    }
+}
+
+function excluirVaga(id) {
+    if (!podeEditar()) return;
+    
+    if (confirm('Tem certeza que deseja excluir esta vaga?')) {
+        const index = vagas.findIndex(v => v.id === id);
+        if (index !== -1) {
+            vagas.splice(index, 1);
+            salvarVagas();
+            renderizarTabelaVagas();
+            atualizarContadores();
+            gerarMatchingAutomatico();
+            
+            alert('✅ Vaga excluída com sucesso!');
+        }
+    }
+}
+
+function atualizarDataRegistro(tipo, id) {
+    if (!podeEditar()) return;
+    
+    if (tipo === 'profissionais') {
+        const prof = profissionais.find(p => p.id === id);
+        if (prof) {
+            prof.dataAtualizacao = getDataAtualFormatada();
+            prof.usuarioAtualizacao = usuarios[usuarioLogado] ? `${usuarios[usuarioLogado].nome} ${usuarios[usuarioLogado].sobrenome}` : 'Usuário';
+            salvarProfissionais();
+            renderizarTabelaProfissionais();
+        }
+    } else {
+        const vaga = vagas.find(v => v.id === id);
+        if (vaga) {
+            vaga.dataAtualizacao = getDataAtualFormatada();
+            vaga.usuarioAtualizacao = usuarios[usuarioLogado] ? `${usuarios[usuarioLogado].nome} ${usuarios[usuarioLogado].sobrenome}` : 'Usuário';
+            salvarVagas();
+            renderizarTabelaVagas();
+        }
+    }
+}
+
+// ===== FUNÇÕES DE FILTRO =====
+function filtrarTabela(inputId, tabelaId) {
+    const filtro = document.getElementById(inputId).value.toUpperCase();
+    const tabela = document.getElementById(tabelaId);
+    const linhas = tabela.getElementsByTagName('tr');
+    
+    for (let i = 1; i < linhas.length; i++) {
+        const linha = linhas[i];
+        const texto = linha.textContent || linha.innerText;
+        if (texto.toUpperCase().indexOf(filtro) > -1) {
+            linha.style.display = '';
+        } else {
+            linha.style.display = 'none';
+        }
+    }
+}
+
+function filtrarPorStatus(status, tipo) {
+    // Atualizar botões ativos
+    const botoes = document.querySelectorAll(`#${tipo === 'profissionais' ? 'painelVagas' : 'painelVagas + .painel'} .btn-filtro`);
+    botoes.forEach(btn => btn.classList.remove('ativo'));
+    event.target.classList.add('ativo');
+    
+    // Filtrar tabela
+    const tabelaId = tipo === 'profissionais' ? 'tabelaVagas' : 'tabelaProfissionais';
+    const tabela = document.getElementById(tabelaId);
+    const linhas = tabela.getElementsByTagName('tr');
+    
+    for (let i = 1; i < linhas.length; i++) {
+        const linha = linhas[i];
+        let mostrar = false;
+        
+        if (status === 'todos') {
+            mostrar = true;
+        } else if (tipo === 'profissionais') {
+            const statusCell = linha.cells[3];
+            if (statusCell) {
+                const statusTexto = statusCell.textContent || statusCell.innerText;
+                if (status === 'disponivel' && statusTexto.includes('Disponível')) {
+                    mostrar = true;
+                } else if (status === 'contratado' && statusTexto.includes('Contratado')) {
+                    mostrar = true;
+                }
+            }
+        } else {
+            const statusCell = linha.cells[2];
+            if (statusCell) {
+                const statusTexto = statusCell.textContent || statusCell.innerText;
+                if (status === 'aberta' && statusTexto.includes('Aberta')) {
+                    mostrar = true;
+                } else if (status === 'fechada' && statusTexto.includes('Fechada')) {
+                    mostrar = true;
+                }
+            }
+        }
+        
+        linha.style.display = mostrar ? '' : 'none';
+    }
+}
+
+// ===== MATCHING AUTOMÁTICO =====
+function gerarMatchingAutomatico() {
+    if (!podeEditar()) {
+        alert('⚠️ Você não tem permissão para gerar matches!');
+        return;
+    }
+    
+    matches = [];
+    
+    vagas.forEach(vaga => {
+        if (vaga.status.includes('Aberta')) {
+            profissionais.forEach(prof => {
+                if (prof.disponibilidade.includes('Disponível')) {
+                    const score = calcularScoreCompatibilidade(prof.cargo, vaga.vaga);
+                    if (score >= 0.4) { // Apenas matches com pelo menos 40% de compatibilidade
+                        matches.push({
+                            id: `${vaga.id}-${prof.id}`,
+                            profissionalId: prof.id,
+                            profissionalNome: prof.nome,
+                            profissionalCargo: prof.cargo,
+                            vagaId: vaga.id,
+                            vagaEmpresa: vaga.empresa,
+                            vagaCargo: vaga.vaga,
+                            compatibilidade: score,
+                            status: 'Pendente',
+                            dataCriacao: getDataAtualFormatada()
+                        });
+                    }
+                }
+            });
+        }
+    });
+    
+    // Ordenar por compatibilidade
+    matches.sort((a, b) => b.compatibilidade - a.compatibilidade);
+    
+    salvarMatches();
+    renderizarMatching();
+    
+    alert(`✅ ${matches.length} matches gerados com sucesso!`);
+}
+
+function renderizarMatching() {
+    const tbody = document.getElementById('corpoMatching');
+    tbody.innerHTML = '';
+    
+    matches.forEach(match => {
+        const tr = document.createElement('tr');
+        
+        let compatibilidadeClass = 'compatibilidade-baixa';
+        if (match.compatibilidade >= 0.7) compatibilidadeClass = 'compatibilidade-alta';
+        else if (match.compatibilidade >= 0.4) compatibilidadeClass = 'compatibilidade-media';
+        
+        const porcentagem = Math.round(match.compatibilidade * 100);
+        
+        tr.innerHTML = `
+            <td>${match.profissionalNome}</td>
+            <td>${match.profissionalCargo}</td>
+            <td>${match.vagaCargo}</td>
+            <td>${match.vagaEmpresa}</td>
+            <td><span class="${compatibilidadeClass}">${porcentagem}%</span></td>
+            <td>${match.status}</td>
+            ${podeEditar() ? `
+            <td>
+                <button class="acao-btn acao-editar" onclick="editarStatusMatch('${match.id}')">
+                    ✏️ Status
+                </button>
+                <button class="acao-btn acao-excluir" onclick="excluirMatch('${match.id}')">
+                    🗑️ Excluir
+                </button>
+            </td>` : '<td></td>'}
+        `;
+        
+        tbody.appendChild(tr);
+    });
+}
+
+function editarStatusMatch(id) {
+    if (!podeEditar()) return;
+    
+    const match = matches.find(m => m.id === id);
+    if (!match) return;
+    
+    const novoStatus = prompt('Editar Status do Match (Pendente/Em andamento/Contratado/Descartado):', match.status || 'Pendente');
+    if (novoStatus !== null) {
+        match.status = novoStatus;
+        salvarMatches();
+        renderizarMatching();
+    }
+}
+
+function excluirMatch(id) {
+    if (!podeEditar()) return;
+    
+    if (confirm('Tem certeza que deseja excluir este match?')) {
+        const index = matches.findIndex(m => m.id === id);
+        if (index !== -1) {
+            matches.splice(index, 1);
+            salvarMatches();
+            renderizarMatching();
+        }
+    }
+}
+
+function filtrarMatchingPorStatus(status) {
+    // Atualizar botões ativos
+    const botoes = document.querySelectorAll('#tabelaMatching').closest('.painel').querySelectorAll('.btn-filtro');
+    botoes.forEach(btn => btn.classList.remove('ativo'));
+    event.target.classList.add('ativo');
+    
+    // Filtrar tabela
+    const tabela = document.getElementById('tabelaMatching');
+    const linhas = tabela.getElementsByTagName('tr');
+    
+    for (let i = 1; i < linhas.length; i++) {
+        const linha = linhas[i];
+        let mostrar = false;
+        
+        if (status === 'todos') {
+            mostrar = true;
+        } else if (status === 'alta') {
+            const compatibilidadeCell = linha.cells[4];
+            if (compatibilidadeCell) {
+                const texto = compatibilidadeCell.textContent || compatibilidadeCell.innerText;
+                if (texto.includes('alta') || texto.includes('Alta') || parseInt(texto) >= 70) {
+                    mostrar = true;
+                }
+            }
+        } else if (status === 'disponivel') {
+            // Aqui você pode implementar lógica mais específica se necessário
+            mostrar = true;
+        }
+        
+        linha.style.display = mostrar ? '' : 'none';
+    }
+}
+
+// ===== OUTRAS FUNÇÕES =====
+function atualizarCompatibilidade() {
+    renderizarTabelaProfissionais();
+    renderizarTabelaVagas();
+    gerarMatchingAutomatico();
+    alert('✅ Compatibilidade atualizada com sucesso!');
+}
+
+function exportarParaExcel(tipo) {
+    alert('✅ Função de exportação para Excel será implementada em breve!');
+}
+
+function limparTodosDados() {
+    if (!podeAdministrar()) {
+        alert('⚠️ Apenas administradores podem limpar todos os dados!');
+        return;
+    }
+    
+    if (confirm('⚠️ ATENÇÃO: Esta ação irá apagar TODOS os dados do sistema (profissionais, vagas e matches). Tem certeza?')) {
+        profissionais = [];
+        vagas = [];
+        matches = [];
+        
+        localStorage.removeItem('profissionais');
+        localStorage.removeItem('vagas');
+        localStorage.removeItem('matches');
+        
+        renderizarTabelaProfissionais();
+        renderizarTabelaVagas();
+        renderizarMatching();
+        atualizarContadores();
+        
+        alert('✅ Todos os dados foram removidos com sucesso!');
+    }
+}
+
+// Função para permitir login com Enter
+document.getElementById('password')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        fazerLogin();
+    }
+});
+
+// Inicializar o sistema
+inicializarSistema();
+</script>
+</body>
+</html>
