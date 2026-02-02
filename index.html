@@ -1192,7 +1192,7 @@ const ADMIN_INICIAL = {
 // ===== INICIALIZAÇÃO =====
 function inicializarSistema() {
     carregarUsuarios();
-    verificarLogin();
+    // A verificação de login agora é feita por verificarLoginPersistente() ✅ CORREÇÃO
 }
 
 function carregarUsuarios() {
@@ -1248,16 +1248,28 @@ document.addEventListener('DOMContentLoaded', function() {
         cadastrarUsuario();
     });
     
-    // Verificar se já está logado
+    // Configurar evento Enter no campo de senha
+    document.getElementById('password')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            fazerLogin();
+        }
+    });
+    
+    // Verificar se já está logado ✅ CORREÇÃO: Nova função para login persistente
+    verificarLoginPersistente();
+});
+
+// ✅ CORREÇÃO: Nova função para verificar login persistente
+function verificarLoginPersistente() {
     const usuarioSalvo = localStorage.getItem('usuarioLogado');
     const nivelSalvo = localStorage.getItem('nivelUsuario');
     
     if (usuarioSalvo && nivelSalvo) {
-        // Tentar encontrar o usuário por email ou nome de usuário
-        let usuarioEncontrado = null;
+        // Primeiro carregar os usuários
+        carregarUsuarios();
         
-        // Primeiro procura por email
-        usuarioEncontrado = usuarios[usuarioSalvo];
+        // Tentar encontrar o usuário por email
+        let usuarioEncontrado = usuarios[usuarioSalvo];
         
         // Se não encontrou por email, procura por nome de usuário
         if (!usuarioEncontrado) {
@@ -1272,11 +1284,14 @@ document.addEventListener('DOMContentLoaded', function() {
             fazerLoginAutomatico(usuarioEncontrado.email, nivelSalvo);
         } else {
             mostrarTelaLogin();
+            // Remover dados inválidos do localStorage
+            localStorage.removeItem('usuarioLogado');
+            localStorage.removeItem('nivelUsuario');
         }
     } else {
         mostrarTelaLogin();
     }
-});
+}
 
 function fazerLogin() {
     const identificacao = document.getElementById('username').value.trim().toLowerCase();
@@ -1285,6 +1300,11 @@ function fazerLogin() {
     if (!identificacao || !senha) {
         alert('⚠️ Por favor, preencha email/usuário e senha!');
         return;
+    }
+    
+    // Garantir que os usuários estão carregados ✅ CORREÇÃO
+    if (Object.keys(usuarios).length === 0) {
+        carregarUsuarios();
     }
     
     // Procurar usuário por email ou nome de usuário
@@ -1322,7 +1342,7 @@ function fazerLogin() {
     usuarioLogado = usuario.email;
     nivelUsuario = usuario.nivel;
     
-    // Salvar no localStorage
+    // ✅ CORREÇÃO: Salvar no localStorage para persistência
     localStorage.setItem('usuarioLogado', usuario.email);
     localStorage.setItem('nivelUsuario', usuario.nivel);
     
@@ -1343,10 +1363,16 @@ function fazerLoginAutomatico(email, nivel) {
     }
     
     usuarioLogado = email;
-    nivelUsuario = nivel;
+    nivelUsuario = usuario.nivel;
+    
+    // ✅ CORREÇÃO: Garantir que está salvo no localStorage
+    localStorage.setItem('usuarioLogado', email);
+    localStorage.setItem('nivelUsuario', usuario.nivel);
     
     atualizarInterfaceUsuario();
     inicializarPainel();
+    
+    console.log(`✅ Login automático realizado: ${usuario.nome}`);
 }
 
 function mostrarTelaLogin() {
@@ -1433,12 +1459,10 @@ function cadastrarUsuario() {
     
     salvarUsuarios();
     
-    // >>> CORREÇÃO ADICIONADA AQUI <<<
     // Se o usuário atual é admin, atualizar a lista
     if (usuarioLogado && usuarios[usuarioLogado]?.nivel === 'admin') {
         carregarListaUsuarios();
     }
-    // >>> FIM DA CORREÇÃO <<<
     
     // Limpar formulário
     document.getElementById('cadastroForm').reset();
@@ -1457,6 +1481,12 @@ function validarEmail(email) {
 
 // ===== FUNÇÕES DO USUÁRIO LOGADO =====
 function atualizarInterfaceUsuario() {
+    // ✅ CORREÇÃO: Verificar se temos um usuário válido
+    if (!usuarioLogado || !usuarios[usuarioLogado]) {
+        mostrarTelaLogin();
+        return;
+    }
+    
     const usuario = usuarios[usuarioLogado];
     
     document.getElementById('loginScreen').style.display = 'none';
@@ -1501,8 +1531,13 @@ function fazerLogout() {
     if (confirm('Deseja realmente sair do sistema?')) {
         usuarioLogado = null;
         nivelUsuario = null;
+        
+        // ✅ CORREÇÃO: Limpar TUDO do localStorage relacionado ao login
         localStorage.removeItem('usuarioLogado');
         localStorage.removeItem('nivelUsuario');
+        
+        // Limpar também sessionStorage para garantir
+        sessionStorage.clear();
         
         mostrarTelaLogin();
         alert('👋 Você saiu do sistema!');
@@ -2660,15 +2695,10 @@ function limparTodosDados() {
     }
 }
 
-// Função para permitir login com Enter
-document.getElementById('password')?.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        fazerLogin();
-    }
+// Inicializar o sistema quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarSistema();
 });
-
-// Inicializar o sistema
-inicializarSistema();
 </script>
 </body>
 </html>
