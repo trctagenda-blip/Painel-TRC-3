@@ -1433,6 +1433,13 @@ function cadastrarUsuario() {
     
     salvarUsuarios();
     
+    // >>> CORREÇÃO ADICIONADA AQUI <<<
+    // Se o usuário atual é admin, atualizar a lista
+    if (usuarioLogado && usuarios[usuarioLogado]?.nivel === 'admin') {
+        carregarListaUsuarios();
+    }
+    // >>> FIM DA CORREÇÃO <<<
+    
     // Limpar formulário
     document.getElementById('cadastroForm').reset();
     
@@ -1447,9 +1454,7 @@ function validarEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
 }
-if (usuarioLogado && usuarios[usuarioLogado]?.nivel === 'admin') {
-    carregarListaUsuarios();
-}
+
 // ===== FUNÇÕES DO USUÁRIO LOGADO =====
 function atualizarInterfaceUsuario() {
     const usuario = usuarios[usuarioLogado];
