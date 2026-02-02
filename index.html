@@ -2251,45 +2251,171 @@ function renderizarTabelaVagas() {
     document.getElementById('contadorVagas').textContent = vagas.length;
 }
 
+// ✅ CORREÇÃO: FUNÇÃO DE COMPATIBILIDADE MELHORADA
 function calcularScoreCompatibilidade(cargoProfissional, cargoVaga) {
     if (!cargoProfissional || !cargoVaga) return 0;
     
     const cargoProf = cargoProfissional.toLowerCase();
     const cargoV = cargoVaga.toLowerCase();
     
-    // Palavras-chave para matching
-    const palavrasChave = [
-        { palavras: ['gerente', 'manager', 'gestor'], peso: 1.0 },
-        { palavras: ['diretor', 'director', 'head'], peso: 0.9 },
-        { palavras: ['coordenador', 'coordenadora', 'coordinator'], peso: 0.8 },
-        { palavras: ['supervisor', 'supervisora', 'superintendent'], peso: 0.7 },
-        { palavras: ['analista', 'analyst', 'especialista'], peso: 0.6 },
-        { palavras: ['assistente', 'assistant', 'auxiliar'], peso: 0.5 },
-        { palavras: ['cobrança', 'collections', 'recebíveis'], peso: 1.0 },
-        { palavras: ['crédito', 'credit', 'risk'], peso: 0.9 },
-        { palavras: ['financeiro', 'finance', 'financial'], peso: 0.8 },
-        { palavras: ['contábil', 'accounting', 'contabilidade'], peso: 0.7 },
-        { palavras: ['comercial', 'commercial', 'sales'], peso: 0.6 },
-        { palavras: ['jurídico', 'legal', 'law'], peso: 0.5 }
-    ];
+    // Definição das áreas
+    const areas = {
+        'cobrança': ['cobrança', 'collections', 'recebíveis', 'recuperação', 'inadimplência'],
+        'crédito': ['crédito', 'credit', 'risk', 'risco', 'análise de crédito', 'analista de crédito'],
+        'financeiro': ['financeiro', 'finance', 'financial', 'finanças', 'controller', 'controladoria'],
+        'contábil': ['contábil', 'accounting', 'contabilidade', 'contador', 'fiscal', 'tributário'],
+        'comercial': ['comercial', 'commercial', 'sales', 'vendas', 'vendedor', 'representante'],
+        'jurídico': ['jurídico', 'legal', 'law', 'advogado', 'advogada', 'processos'],
+        'administrativo': ['administrativo', 'admin', 'administration', 'assistente administrativo']
+    };
     
+    // Definição dos níveis hierárquicos (do menor para o maior)
+    const niveis = {
+        'estagiário': 1,
+        'assistente': 2,
+        'analista': 3,
+        'supervisor': 4,
+        'coordenador': 5,
+        'gerente': 6,
+        'diretor': 7,
+        'vice-presidente': 8,
+        'presidente': 9
+    };
+    
+    // Palavras-chave para identificar níveis
+    const palavrasNivel = {
+        'estagiário': ['estagiário', 'estágio', 'intern', 'trainee'],
+        'assistente': ['assistente', 'assistant', 'auxiliar', 'auxiliary'],
+        'analista': ['analista', 'analyst', 'especialista', 'specialist'],
+        'supervisor': ['supervisor', 'supervisora', 'superintendent', 'líder', 'lider'],
+        'coordenador': ['coordenador', 'coordenadora', 'coordinator', 'coordenator'],
+        'gerente': ['gerente', 'manager', 'gestor', 'management'],
+        'diretor': ['diretor', 'director', 'head', 'chefe', 'chief'],
+        'vice-presidente': ['vice-presidente', 'vice president', 'vice'],
+        'presidente': ['presidente', 'president', 'ceo']
+    };
+    
+    // Encontrar área do profissional e da vaga
+    let areaProf = null;
+    let areaVaga = null;
+    
+    for (const [area, palavras] of Object.entries(areas)) {
+        for (const palavra of palavras) {
+            if (cargoProf.includes(palavra) && !areaProf) {
+                areaProf = area;
+            }
+            if (cargoV.includes(palavra) && !areaVaga) {
+                areaVaga = area;
+            }
+        }
+    }
+    
+    // Encontrar nível do profissional e da vaga
+    let nivelProf = 0;
+    let nivelVaga = 0;
+    
+    for (const [nivel, palavras] of Object.entries(palavrasNivel)) {
+        for (const palavra of palavras) {
+            if (cargoProf.includes(palavra) && nivelProf < niveis[nivel]) {
+                nivelProf = niveis[nivel];
+            }
+            if (cargoV.includes(palavra) && nivelVaga < niveis[nivel]) {
+                nivelVaga = niveis[nivel];
+            }
+        }
+    }
+    
+    // Se não identificou nível, usar valores padrão baseados em palavras-chave genéricas
+    if (nivelProf === 0) {
+        if (cargoProf.includes('gerente') || cargoProf.includes('manager')) nivelProf = 6;
+        else if (cargoProf.includes('diretor') || cargoProf.includes('director')) nivelProf = 7;
+        else if (cargoProf.includes('analista') || cargoProf.includes('analyst')) nivelProf = 3;
+        else if (cargoProf.includes('assistente') || cargoProf.includes('assistant')) nivelProf = 2;
+        else if (cargoProf.includes('supervisor')) nivelProf = 4;
+        else if (cargoProf.includes('coordenador')) nivelProf = 5;
+        else nivelProf = 3; // Padrão: analista
+    }
+    
+    if (nivelVaga === 0) {
+        if (cargoV.includes('gerente') || cargoV.includes('manager')) nivelVaga = 6;
+        else if (cargoV.includes('diretor') || cargoV.includes('director')) nivelVaga = 7;
+        else if (cargoV.includes('analista') || cargoV.includes('analyst')) nivelVaga = 3;
+        else if (cargoV.includes('assistente') || cargoV.includes('assistant')) nivelVaga = 2;
+        else if (cargoV.includes('supervisor')) nivelVaga = 4;
+        else if (cargoV.includes('coordenador')) nivelVaga = 5;
+        else nivelVaga = 3; // Padrão: analista
+    }
+    
+    // Cálculo da compatibilidade
     let score = 0;
-    let matches = 0;
     
-    palavrasChave.forEach(grupo => {
-        grupo.palavras.forEach(palavra => {
+    // 1. Compatibilidade de área (50% do score)
+    if (areaProf && areaVaga && areaProf === areaVaga) {
+        score += 0.5; // Mesma área: 50%
+    } else if (areaProf && areaVaga) {
+        // Áreas relacionadas (ex: cobrança e crédito)
+        const areasRelacionadas = [
+            ['cobrança', 'crédito'],
+            ['financeiro', 'contábil'],
+            ['comercial', 'administrativo']
+        ];
+        
+        let areasRelacionadasFlag = false;
+        for (const par of areasRelacionadas) {
+            if ((areaProf === par[0] && areaVaga === par[1]) || (areaProf === par[1] && areaVaga === par[0])) {
+                areasRelacionadasFlag = true;
+                break;
+            }
+        }
+        
+        if (areasRelacionadasFlag) {
+            score += 0.3; // Áreas relacionadas: 30%
+        } else {
+            score += 0.1; // Áreas diferentes: 10%
+        }
+    } else {
+        // Se não identificou área, usar comparação de palavras-chave
+        const palavrasComuns = ['cobrança', 'crédito', 'financeiro', 'contábil', 'comercial', 'jurídico'];
+        let palavrasCorrespondentes = 0;
+        
+        palavrasComuns.forEach(palavra => {
             if (cargoProf.includes(palavra) && cargoV.includes(palavra)) {
-                score += grupo.peso;
-                matches++;
-            } else if (cargoProf.includes(palavra) || cargoV.includes(palavra)) {
-                score += grupo.peso * 0.3;
+                palavrasCorrespondentes++;
             }
         });
-    });
+        
+        score += (palavrasCorrespondentes > 0) ? 0.3 : 0.1;
+    }
     
-    // Normalizar score
-    if (matches > 0) {
-        score = score / matches;
+    // 2. Compatibilidade de nível (50% do score)
+    const diferencaNivel = Math.abs(nivelProf - nivelVaga);
+    
+    if (diferencaNivel === 0) {
+        // Mesmo nível: 50%
+        score += 0.5;
+    } else if (diferencaNivel === 1) {
+        // Diferença de 1 nível: 40%
+        score += 0.4;
+    } else if (diferencaNivel === 2) {
+        // Diferença de 2 níveis: 25%
+        score += 0.25;
+    } else if (diferencaNivel === 3) {
+        // Diferença de 3 níveis: 15%
+        score += 0.15;
+    } else {
+        // Diferença maior que 3 níveis: 5%
+        score += 0.05;
+    }
+    
+    // Casos especiais
+    // Se o profissional tem nível maior que a vaga (overqualified), reduzir um pouco
+    if (nivelProf > nivelVaga + 2) {
+        score *= 0.8; // Reduz 20% se muito overqualified
+    }
+    
+    // Bônus para cargos exatamente iguais
+    if (cargoProf === cargoV) {
+        score = 1.0; // 100% para cargos idênticos
     }
     
     // Limitar entre 0 e 1
